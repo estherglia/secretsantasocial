@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gift Submissions</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 2rem; }
+        h1 { text-align: center; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 2rem; border-radius: 8px; }
+        #status { text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 2rem; }
+        #submission-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+        .card { border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-bottom: 1px solid #ddd; }
+        .card-content { padding: 1rem; }
+        .card-content h3 { margin: 0 0 0.5rem 0; font-size: 1.2rem; }
+        .card-content p { margin: 0.25rem 0; font-size: 0.9rem; }
+        .card-content a { color: #007bff; text-decoration: none; word-break: break-all; }
+        #controls { text-align: center; margin-top: 2rem; }
+        #clearButton { background: #d90429; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gift Submission Tracker</h1>
+        <div id="status">Loading submissions...</div>
+        <div id="submission-list"></div>
+        <div id="controls">
+            <button id="clearButton">Clear All Submissions (Testing Only)</button>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            loadSubmissions();
+        });
+
+        function loadSubmissions() {
+            const listElement = document.getElementById('submission-list');
+            const statusElement = document.getElementById('status');
+            listElement.innerHTML = ''; // Clear old list
+
+            const gifts = JSON.parse(localStorage.getItem('secretSantaGifts')) || [];
+
+            statusElement.textContent = `Submissions Received: ${gifts.length} / 10`;
+
+            if (gifts.length === 0) {
+                listElement.innerHTML = '<p>No submissions yet.</p>';
+                return;
+            }
+
+            gifts.forEach(gift => {
+                const card = `
+                    <div class="card">
+                        <img src="${gift.img}" alt="${gift.giftName}" onerror="this.src='https://via.placeholder.com/250x200?text=Image+Error';">
+                        <div class="card-content">
+                            <h3>${gift.giftName}</h3>
+                            <p><strong>From:</strong> ${gift.from}</p>
+                            <p><a href="${gift.link}" target="_blank">View Item</a></p>
+                        </div>
+                    </div>
+                `;
+                listElement.innerHTML += card;
+            });
+        }
+
+        document.getElementById('clearButton').addEventListener('click', function() {
+            if (confirm('ARE YOU SURE? This will delete all submitted gifts. This is for testing only.')) {
+                localStorage.removeItem('secretSantaGifts');
+                loadSubmissions();
+                alert('All submissions cleared.');
+            }
+        });
+    </script>
+</body>
+</html>
